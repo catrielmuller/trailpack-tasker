@@ -83,42 +83,41 @@ function getWorkerProfile(taskerConfig) {
  * @returns {object} - taskerConfig
  */
 function configureExchangesAndQueues(profile, taskerConfig) {
-  const exchangeName = taskerConfig.exchange || 'tasker-work-x'
-  const workQueueName = taskerConfig.workQueueName || 'tasker-work-q'
-  const interruptQueueName = taskerConfig.interruptQueueName || 'tasker-interrupt-q'
+    const exchangeName = taskerConfig.exchange || 'tasker-work-x'
+    const workQueueName = taskerConfig.workQueueName || 'tasker-work-q'
+    const interruptQueueName = taskerConfig.interruptQueueName || 'tasker-interrupt-q'
+    const limit = taskerConfig.concurrentTasks || 10
 
-  taskerConfig.exchangeName = exchangeName
-  taskerConfig.exchanges = [{
-    name: exchangeName,
-    type: 'topic',
-    autoDelete: false
-  }]
+    taskerConfig.exchangeName = exchangeName
+    taskerConfig.exchanges = [{
+        name: exchangeName,
+        type: 'topic',
+        autoDelete: false
+    }]
 
-  taskerConfig.queues = [{
-    name: workQueueName,
-    autoDelete: false,
-    subscribe: true
-  }, {
-    name: interruptQueueName,
-    autoDelete: false,
-    subscribe: true
-  }]
+    taskerConfig.queues = [{
+        name: workQueueName,
+        autoDelete: false,
+        subscribe: true,
+        limit: limit
+    }, {
+        name: interruptQueueName,
+        autoDelete: false,
+        subscribe: true,
+        limit: limit
+    }]
 
-  taskerConfig.bindings = [{
-    exchange: exchangeName,
-    target: workQueueName,
-    keys: profile.tasks
-  }, {
-    exchange: exchangeName,
-    target: interruptQueueName,
-    keys: profile.tasks.map(task => task + '.interrupt')
-  }]
+    taskerConfig.bindings = [{
+        exchange: exchangeName,
+        target: workQueueName,
+        keys: profile.tasks
+    }, {
+        exchange: exchangeName,
+        target: interruptQueueName,
+        keys: profile.tasks.map(task => task + '.interrupt')
+    }]
 
-  return taskerConfig
+    return taskerConfig
 }
-
-
-
-
 
 exports.Task = lib.Task
